@@ -1,8 +1,9 @@
-package com.endava.cacheableobserver.observer;
+package com.croitorivan.cacheableobserver.observer;
+
+import com.croitorivan.cacheableobserver.event.Event;
 
 import java.util.List;
 
-import com.endava.cacheableobserver.event.Event;
 
 /**
  * A class can implement the Observer interface when it wants to be informed of changes in observable objects.

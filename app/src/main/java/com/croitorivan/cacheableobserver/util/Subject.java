@@ -1,7 +1,8 @@
-package com.endava.cacheableobserver.util;
+package com.croitorivan.cacheableobserver.util;
 
-import com.endava.cacheableobserver.event.Event;
-import com.endava.cacheableobserver.observer.Observer;
+
+import com.croitorivan.cacheableobserver.event.Event;
+import com.croitorivan.cacheableobserver.observer.Observer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class Subject {
             final Observer observer = getObserver(observerKey);
             if (observer != null) {
                 final Iterator<Event> iterator = eventsForObserver.iterator();
-                while(iterator.hasNext()){
+                while (iterator.hasNext()) {
                     final Event event = iterator.next();
                     observer.onEvent(event);
                     iterator.remove();
@@ -96,8 +97,8 @@ public class Subject {
         Observer observer = null;
         for (Observer next : observers) {
             final List<String> observerKeys = next.getObserverKeys();
-            if(observerKeys.contains(key)){
-                observer=next;
+            if (observerKeys.contains(key)) {
+                observer = next;
                 break;
             }
         }

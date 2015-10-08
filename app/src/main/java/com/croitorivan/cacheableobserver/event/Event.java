@@ -1,9 +1,9 @@
-package com.endava.cacheableobserver.event;
+package com.croitorivan.cacheableobserver.event;
 
 import android.os.Parcelable;
 
-import com.endava.cacheableobserver.observer.Observer;
-import com.endava.cacheableobserver.util.Subject;
+import com.croitorivan.cacheableobserver.observer.Observer;
+
 
 /**
  * A class can implement this interface to interact between {@link Subject}
