@@ -16,8 +16,9 @@ import java.util.Map;
  */
 public class Subject {
 
-    private Map<String, List<Event>> events = new HashMap<>();
+    private Map<EventContext, List<Event>> events = new HashMap<>();
     private List<Observer> observers = new ArrayList<>();
+    private String context;
 
     public Subject() {
     }
@@ -48,25 +49,27 @@ public class Subject {
         observers.remove(observer);
     }
 
-
     /**
      * Caches {@link Event} and notifies {@link Observer}
      *
      * @param e event instance
      */
     public void onNewEvent(Event e) {
-        List<Event> eventsList = events.get(e.getEventKey());
-        if (eventsList == null) {
-            eventsList = new ArrayList<>();
+        final EventContext eventKey = e.getEventKey();
+        if (eventKey.isOfActiveContext(context)) {
+            List<Event> eventsList = events.get(eventKey);
+            if (eventsList == null) {
+                eventsList = new ArrayList<>();
+                events.put(eventKey, eventsList);
+            }
+            eventsList.add(e);
+            notifyScheduledEvents(eventKey);
         }
-        eventsList.add(e);
-        events.put(e.getEventKey(), eventsList);
-        notifyScheduledEvents(e.getEventKey());
     }
 
-    private void fireCachedEvents(List<String> observerKeys) {
+    private void fireCachedEvents(List<EventContext> observerKeys) {
         if (observerKeys != null && !observerKeys.isEmpty()) {
-            for (String key : observerKeys) {
+            for (EventContext key : observerKeys) {
                 notifyScheduledEvents(key);
             }
         }
@@ -78,10 +81,10 @@ public class Subject {
         }
     }
 
-    private void notifyScheduledEvents(String observerKey) {
-        final List<Event> eventsForObserver = this.events.get(observerKey);
+    private void notifyScheduledEvents(EventContext eventContext) {
+        final List<Event> eventsForObserver = this.events.get(eventContext);
         if (eventsForObserver != null && !eventsForObserver.isEmpty()) {
-            final Observer observer = getObserver(observerKey);
+            final Observer observer = getObserver(eventContext);
             if (observer != null) {
                 final Iterator<Event> iterator = eventsForObserver.iterator();
                 while (iterator.hasNext()) {
@@ -93,15 +96,36 @@ public class Subject {
         }
     }
 
-    private Observer getObserver(String key) {
+    private Observer getObserver(EventContext key) {
         Observer observer = null;
         for (Observer next : observers) {
-            final List<String> observerKeys = next.getObserverKeys();
+            final List<EventContext> observerKeys = next.getObserverKeys();
             if (observerKeys.contains(key)) {
                 observer = next;
                 break;
             }
         }
         return observer;
+    }
+
+    /**
+     * Used to change the active context for event.
+     * Also removes all the pending events.
+     *
+     * @param context the new context to use.
+     */
+    public void setContext(String context) {
+        this.context = context;
+        clearEventsForOldContext();
+    }
+
+    private void clearEventsForOldContext() {
+        final Iterator<Map.Entry<EventContext, List<Event>>> iterator = events.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<EventContext, List<Event>> entry = iterator.next();
+            if (!entry.getKey().isOfActiveContext(context)) {
+                iterator.remove();
+            }
+        }
     }
 }

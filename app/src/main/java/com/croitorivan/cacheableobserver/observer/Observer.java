@@ -1,6 +1,7 @@
 package com.croitorivan.cacheableobserver.observer;
 
 import com.croitorivan.cacheableobserver.event.Event;
+import com.croitorivan.cacheableobserver.util.EventContext;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface Observer {
      * Returns observer identifier
      * @return {@link List} of {@link String} that represents events identifiers of observer
      */
-    List<String> getObserverKeys();
+    List<EventContext> getObserverKeys();
 
 
 }
