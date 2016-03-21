@@ -30,7 +30,7 @@ public class Subject {
      */
     public void registerObserver(Observer observer) {
         if (observer == null) {
-            throw new NullPointerException("Observer must be not null");
+            throw new NullPointerException("Observer must not be null");
         }
         addNewObserver(observer);
         fireCachedEvents(observer.getObserverKeys());
@@ -44,7 +44,7 @@ public class Subject {
      */
     public void unregisterObservers(Observer observer) {
         if (observer == null) {
-            throw new NullPointerException("Observer must be not null");
+            throw new NullPointerException("Observer must not be null");
         }
         observers.remove(observer);
     }
@@ -84,28 +84,31 @@ public class Subject {
     private void notifyScheduledEvents(EventContext eventContext) {
         final List<Event> eventsForObserver = this.events.get(eventContext);
         if (eventsForObserver != null && !eventsForObserver.isEmpty()) {
-            final Observer observer = getObserver(eventContext);
-            if (observer != null) {
+            final List<Observer> observers = getObserver(eventContext);
+            if (observers != null && !observers.isEmpty()) {
                 final Iterator<Event> iterator = eventsForObserver.iterator();
                 while (iterator.hasNext()) {
                     final Event event = iterator.next();
-                    observer.onEvent(event);
-                    iterator.remove();
+                    for (Observer observer : observers) {
+                        observer.onEvent(event);
+                    }
+                    if (observers.get(observers.size() - 1).isMainObserverForKey(eventContext)) {
+                        iterator.remove();
+                    }
                 }
             }
         }
     }
 
-    private Observer getObserver(EventContext key) {
-        Observer observer = null;
+    private List<Observer> getObserver(EventContext key) {
+        List<Observer> observersToReturn = new ArrayList<>();
         for (Observer next : observers) {
             final List<EventContext> observerKeys = next.getObserverKeys();
             if (observerKeys.contains(key)) {
-                observer = next;
-                break;
+                observersToReturn.add(next.isMainObserverForKey(key) ? observersToReturn.size() : 0, next);
             }
         }
-        return observer;
+        return observersToReturn;
     }
 
     /**
