@@ -104,7 +104,7 @@ public class Subject {
         List<Observer> observersToReturn = new ArrayList<>();
         for (Observer next : observers) {
             final List<EventContext> observerKeys = next.getObserverKeys();
-            if (observerKeys.contains(key)) {
+            if (observerKeys != null && observerKeys.contains(key)) {
                 observersToReturn.add(next.isMainObserverForKey(key) ? observersToReturn.size() : 0, next);
             }
         }
